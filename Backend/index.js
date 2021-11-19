@@ -187,7 +187,7 @@ const {getProductName, checkProductExists, addProduct, getAllProducts, updatePri
 // }
 
 app.post('/add-product', async function(req, res){
-    
+
     
     
     try {
@@ -204,6 +204,8 @@ app.post('/add-product', async function(req, res){
             checkProductExists(product);
             // console.log(product);
         }
+
+        // test
 
         product.magasin = magasin;
         
