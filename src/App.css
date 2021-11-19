@@ -1,0 +1,122 @@
+html {
+  scroll-behavior: smooth;
+}
+.App {
+  width: 100%;
+  display:block;
+  overflow:hidden;
+}
+/* André Carrousel */
+
+.carousel {
+  display:block;
+  width: 100%;
+  background: grey;
+  overflow-x: scroll;
+  padding: 15px 0px;
+  margin: 0;
+  white-space: nowrap; 
+  border-top: 2px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  scroll-behavior: smooth;
+  position: relative;
+}
+
+.carousel-before {
+  position: fixed;
+  left: 1%;
+  top: 27%;
+  width: 100px;
+  height: 50px;
+  border-radius: 10px;
+  border: solid orange 1px !important;
+  z-index: 5;
+}
+
+.carousel-after {
+  position: fixed;
+  right: 1%;
+  top: 27%;
+  width: 100px;
+  height: 50px;
+  border-radius: 10px;
+  border: solid orange 1px !important;
+  z-index: 5;
+}
+
+.col {
+    display: inline-block;
+    width: 380px;
+    margin: 10px 10px;
+    height: 380px;
+    background: rgba(0, 0, 0, 0.05) no-repeat center center;
+    background-size: cover;
+    position:relative;
+    border-radius: 20px;
+    box-shadow: 0 0 10px #dfdfdf;
+    z-index: 1
+}
+
+ .graph-col { /*//height: 400, width: "100%", backgroundColor: "green" */
+  display: inline-block;
+  width: 280px;
+  margin: 0px 10px;
+  height: 280px;
+  background: rgba(0, 0, 0, 0.05) no-repeat center center;
+  background-size: cover;
+  position:relative;
+  border-radius: 20px;
+  box-shadow: 0 0 10px #dfdfdf;
+  z-index: 1;
+  align-self: flex-end;
+}
+
+.product {
+  display: inline-block;
+  width: 280px;
+  margin: 0px 10px;
+  height: 280px;
+  background: rgba(0, 0, 0, 0.05) no-repeat center center;
+  background-size: cover;
+  position:relative;
+  border-radius: 20px;
+  box-shadow: 0 0 10px #dfdfdf;
+  z-index: 1
+}
+
+.product-top {
+  width: 90%;
+  height: 65%;
+  background-color: white;
+  border-radius: 20px 20px 0px 0px;
+  margin: 10px auto ;
+}
+
+.product-bottom {
+  width: 90%;
+  margin: auto;
+}
+
+.product-top>img{
+  border-radius: 20px 20px 0px 0px;
+  margin: auto;
+}
+
+#prix{
+  font-weight: bold;
+  /* padding-bottom: 20px; */
+}
+
+#description{
+
+}
+
+li {
+  list-style: none;
+}
+
+.router-link {
+  color: black !important;
+  font-weight: bold;
+  text-decoration: none;
+}
