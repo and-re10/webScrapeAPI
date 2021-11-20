@@ -5,7 +5,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 
 const getProductName = () => {
-    fs.readFile(path.resolve('Backend', 'student.json'), 'utf-8', (err, data) => {
+    fs.readFile(path.resolve('Backend', 'database.json'), 'utf-8', (err, data) => {
         if (err) {
             throw err;
         }
@@ -13,13 +13,13 @@ const getProductName = () => {
         // parse JSON object
         const parseJson = JSON.parse(data.toString());
     
-        console.log(parseJson.database.users.products)
+        console.log(parseJson.database.products)
         
     });
 }
 
 const checkProductExists = (product) => {
-    fs.readFile(path.resolve('Backend', 'student.json'), 'utf-8', (err, data) => {
+    fs.readFile(path.resolve('Backend', 'database.json'), 'utf-8', (err, data) => {
         if (err) {
             throw err;
         }
@@ -28,8 +28,8 @@ const checkProductExists = (product) => {
         const parseJson = JSON.parse(data.toString());
         console.log("Description: " + product.description)
         let condition = false;
-        for( let i = 0; i < parseJson.database.users.products.length; i++){
-            if (parseJson.database.users.products[i].description === product.description){
+        for( let i = 0; i < parseJson.database.products.length; i++){
+            if (parseJson.database.products[i].description === product.description){
                 condition = true;
                 // console.log("Product already exists")
                 break;
@@ -49,7 +49,7 @@ const checkProductExists = (product) => {
 }
 
 const addProduct = (product) => {
-    fs.readFile(path.resolve('Backend', 'student.json'), 'utf-8', (err, data) => {
+    fs.readFile(path.resolve('Backend', 'database.json'), 'utf-8', (err, data) => {
         if (err) {
             throw err;
         }
@@ -60,11 +60,11 @@ const addProduct = (product) => {
         // print JSON object
         // console.log(parseJson);
     
-        parseJson.database.users.products.push(product)
+        parseJson.database.products.push(product)
     
         // console.log(parseJson);
     
-        fs.writeFileSync(path.resolve('Backend', 'student.json'), JSON.stringify(parseJson));
+        fs.writeFileSync(path.resolve('Backend', 'database.json'), JSON.stringify(parseJson));
         
     });
 }
@@ -72,11 +72,11 @@ const addProduct = (product) => {
 const getAllProducts = () => {
 
     
-    var data = fs.readFileSync(path.resolve('Backend', 'student.json'), 'utf-8')
+    var data = fs.readFileSync(path.resolve('Backend', 'database.json'), 'utf-8')
     data = JSON.parse(data.toString());
     // console.log(data.database);
 
-    return data.database.users.products ;
+    return data.database.products ;
 
 }
 
@@ -130,11 +130,11 @@ const getAllProducts = () => {
 
 const updatePrice = async () => {
     
-    var data = fs.readFileSync(path.resolve('Backend', 'student.json'), 'utf-8')
+    var data = fs.readFileSync(path.resolve('Backend', 'database.json'), 'utf-8')
     
     // parse JSON object
     data = JSON.parse(data.toString());
-    prod = data.database.users.products;
+    prod = data.database.products;
     // console.log(prod.length)
 
     await (async () => {
@@ -225,7 +225,7 @@ const updatePrice = async () => {
             
 
             // print JSON object
-            var product = data.database.users.products.filter(product => product.prodURL === prod[i].prodURL ? true : false);
+            var product = data.database.products.filter(product => product.prodURL === prod[i].prodURL ? true : false);
 
             // console.log(product[0]);
 
@@ -245,11 +245,11 @@ const updatePrice = async () => {
         };
     })()
 
-    console.log(data.database.users.products);
+    console.log(data.database.products);
     
-    fs.writeFileSync(path.resolve('Backend', 'student.json'), JSON.stringify(data));
+    fs.writeFileSync(path.resolve('Backend', 'database.json'), JSON.stringify(data));
     
-    return data.database.users.products;
+    return data.database.products;
         
 
 }
