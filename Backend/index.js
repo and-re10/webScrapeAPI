@@ -17,6 +17,111 @@ const fs = require('fs');
 const path = require('path');
 
 
+const XPath = [
+    {
+        nom: "footlocker",
+        prix: [
+            '//*[@id="ProductDetails"]/div[4]/div[2]/span/span/span[1]/span[2]',
+            '//*[@id="ProductDetails"]/div[4]/div[2]/span/span/span[1]'
+        ],
+        image: [
+            '//*[@id="main"]/div/div[2]/div/section/div[2]/div[1]/div[1]/div/div/div/div[1]/div/div/span/img'
+        ],
+        description: [
+            '//*[@id="pageTitle"]/span/span[1]'
+        ],
+    },
+    {
+        nom: "amazone",
+        prix: [
+            '//*[@id="corePrice_desktop"]/div/table/tbody/tr[1]/td[2]/span[1]/span[1]',
+            '//*[@id="corePrice_desktop"]/div/table/tbody/tr[2]/td[2]/span[1]/span[2]'
+        ],
+        image: [
+            '//*[@id="landingImage"]'
+        ],
+        description: [
+            '//*[@id="productTitle"]'
+        ],
+    }
+]
+
+function getXPaths(magasin){
+    var data = XPath.find(mgs => mgs.nom === magasin)
+    // data.xpaths.forEach(xpath => {
+    //     console.log(xpath)
+    // });
+
+    return data
+}
+
+// getXPaths("amazone");
+
+async function scrapeAllProducts(url, magasin){
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(url);
+
+    const prodURL = url;
+    const xpaths = getXPaths(magasin);
+    console.log(xpaths)
+    // var el = await page.$x(xpaths[0]);
+    // console.log(el)
+    if(xpaths){
+        for (const xpath of xpaths.prix){
+        // await xpaths.forEach(async xpath => {
+            // console.log(xpath)
+            const [el] = await page.$x(xpath);
+            // console.log(el)
+        
+            if( el !== undefined) {
+                // get price
+                var txt = await el.getProperty('textContent');
+                console.log(await txt.jsonValue())
+                var prix = (await txt.jsonValue()).trim();
+                prix = Number(prix.replace(',', '.').replace('€', '').replace(/\s+/g, '').trim());
+                console.log(prix)
+                // browser.close(); 
+
+                break ;
+            }
+        }
+
+        for (const xpath of xpaths.image){
+
+            // get image
+            const [el3] = await page.$x(xpath);// //*[@id="landingImage"]
+            if (el3 !== undefined){
+                const src = await el3.getProperty('src');
+                const image = (await src.jsonValue()).trim();
+                console.log(image);
+                break ;
+            }
+            
+
+        }
+
+        for (const xpath of xpaths.description){
+            // get description
+            const [el4] = await page.$x(xpath);// //*[@id="productTitle"]
+            if(el4 !== undefined){
+                const txtDesc = await el4.getProperty('textContent');
+                const description = (await txtDesc.jsonValue()).trim();
+                console.log(description);
+                break ;
+            }
+            
+        }
+
+        const prixActuel = prix;
+        const allPrix = [prix];
+    }
+    browser.close();
+    
+    return {prodURL, prix, image, description, prixActuel, allPrix}
+}
+
+
 async function scrapeProduct(url){
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
@@ -203,18 +308,22 @@ app.post('/add-product', async function(req, res){
         // const productURL = req.body.ProductURL
         
         console.log(ProductURL);
-        var product;
-        if (magasin === "amazone") {
-            console.log(magasin);
-            product = await scrapeProduct(ProductURL);
-            checkProductExists(product);
+        // nouvelle fonction pour tous les magasins
+        product = await scrapeAllProducts(ProductURL);
+        checkProductExists(product);
 
-        } else if (magasin === "footlocker") {
-            console.log(magasin);
-            product = await scrapeFootLocker(ProductURL);
-            checkProductExists(product);
-            // console.log(product);
-        }
+        // var product;
+        // if (magasin === "amazone") {
+        //     console.log(magasin);
+        //     product = await scrapeProduct(ProductURL);
+        //     checkProductExists(product);
+
+        // } else if (magasin === "footlocker") {
+        //     console.log(magasin);
+        //     product = await scrapeFootLocker(ProductURL);
+        //     checkProductExists(product);
+        //     // console.log(product);
+        // }
 
         // test
 
