@@ -375,7 +375,7 @@ const puppeteer = require('puppeteer');
 //  const txtDesc = await el4.getProperty('textContent');
 //  const description = (await txtDesc.jsonValue()).trim();
 
-const XPath = [
+var XPath = [
     {
         nom: "footlocker",
         prix: [
@@ -401,78 +401,129 @@ const XPath = [
         description: [
             '//*[@id="productTitle"]'
         ],
+    },
+    {
+        nom: "superdry",
+        prix: [
+            '//*[@id="product234289"]/div[2]/div[1]/span'
+        ],
+        image: [
+            '//*[@id="slick-slide00"]/div/img'
+        ],
+        description: [
+            '//*[@id="product234289"]/div[2]/h1'
+            //*[@id="product234833"]
+        ]
     }
+    
 ]
 
-function getXPaths(magasin){
-    var data = XPath.find(mgs => mgs.nom === magasin)
-    // data.xpaths.forEach(xpath => {
-    //     console.log(xpath)
-    // });
-
-    return data
+function getXPaths(magasin, url){
+    var data = XPath.find(mgs => {
+        return mgs.nom === magasin;
+    })
+    console.log(data);
+    if(data.nom === "superdry"){
+        var r = /\d+/;
+        const idProduct = url.match(r)[0];
+        console.log(idProduct);
+        for (let i = 0; i < data.prix.length; i++){      
+            const oldIdProduct = data.prix[i].match(r)[0];
+            console.log(oldIdProduct);
+            data.prix[i] = data.prix[i].replace(oldIdProduct, idProduct);
+            console.log(data.prix[i]); 
+        }
+        for (let i = 0; i < data.description.length; i++) {
+            const oldIdProduct = data.description[i].match(r)[0];
+            console.log(oldIdProduct);
+            data.description[i] = data.description[i].replace(oldIdProduct, idProduct);
+            console.log(data.description[i]);
+        }
+    }
+    console.log(data);
+    return data;
 }
+
+
+getXPaths("superdry", "https://www.superdry.be/be-fr/femme/chaussures/details/180860/bottines-style-western--noir");
 
 // getXPaths("amazone");
 
-async function scrapeAllProducts(url, magasin){
+// async function scrapeAllProducts(url, magasin){
+//     const browser = await puppeteer.launch();
+//     const page = await browser.newPage();
+//     await page.goto(url);
+
+//     const prodURL = url;
+//     const xpaths = getXPaths(magasin);
+//     console.log(xpaths)
+//     // var el = await page.$x(xpaths[0]);
+//     // console.log(el)
+//     if(xpaths){
+//         for (const xpath of xpaths.prix){
+//         // await xpaths.forEach(async xpath => {
+//             // console.log(xpath)
+//             const [el] = await page.$x(xpath);
+//             // console.log(el)
+        
+//             if( el !== undefined) {
+//                 // get price
+//                 var txt = await el.getProperty('textContent');
+//                 console.log(await txt.jsonValue())
+//                 var prix = (await txt.jsonValue()).trim();
+//                 prix = Number(prix.replace(',', '.').replace('€', '').replace(/\s+/g, '').trim());
+//                 console.log(prix)
+//                 // browser.close(); 
+
+//                 break ;
+//             }
+//         }
+
+//         for (const xpath of xpaths.image){
+
+//             // get image
+//             const [el3] = await page.$x(xpath);// //*[@id="landingImage"]
+//             if (el3 !== undefined){
+//                 const src = await el3.getProperty('src');
+//                 const image = (await src.jsonValue()).trim();
+//                 console.log(image);
+//                 break ;
+//             }
+            
+
+//         }
+
+//         for (const xpath of xpaths.description){
+//             // get description
+//             const [el4] = await page.$x(xpath);// //*[@id="productTitle"]
+//             if(el4 !== undefined){
+//                 const txtDesc = await el4.getProperty('textContent');
+//                 const description = (await txtDesc.jsonValue()).trim();
+//                 console.log(description);
+//                 break ;
+//             }
+            
+//         }
+//     }
+//     browser.close();
+    
+// }
+
+// scrapeAllProducts("https://www.amazon.fr/dp/B08VRVXHV7/ref=sspa_dk_detail_4?pd_rd_w=3KO44&pf_rd_p=c2093833-029c-4c81-8b25-2f17e8aa03bd&pd_rd_wg=piJuf&pf_rd_r=MPCBNWEHTWM47RH1QJWB&pd_rd_r=667c99fd-9ee7-4b9d-b3cc-1b9875dfbad0&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUEzMzAzM0VNNDFITkVIJmVuY3J5cHRlZElkPUEwOTY1NzUwMTFKRDBGWVNUQVdKSSZlbmNyeXB0ZWRBZElkPUEwNzgyNTAxMThVSjZaVTk5N1hIVCZ3aWRnZXROYW1lPXNwX2RldGFpbCZhY3Rpb249Y2xpY2tSZWRpcmVjdCZkb05vdExvZ0NsaWNrPXRydWU&th=1", "amazone")
+
+const superDry = async (url) => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    await page.goto(url);
+    const newPage = await page.goto(url);
 
-    const prodURL = url;
-    const xpaths = getXPaths(magasin);
-    console.log(xpaths)
-    // var el = await page.$x(xpaths[0]);
-    // console.log(el)
-    if(xpaths){
-        for (const xpath of xpaths.prix){
-        // await xpaths.forEach(async xpath => {
-            // console.log(xpath)
-            const [el] = await page.$x(xpath);
-            // console.log(el)
-        
-            if( el !== undefined) {
-                // get price
-                var txt = await el.getProperty('textContent');
-                console.log(await txt.jsonValue())
-                var prix = (await txt.jsonValue()).trim();
-                prix = Number(prix.replace(',', '.').replace('€', '').replace(/\s+/g, '').trim());
-                console.log(prix)
-                // browser.close(); 
+    // console.log(newPage);
 
-                break ;
-            }
-        }
+    var r = /\d+/;
+    // var s = "you can enter maximum 500 choices";
+    console.log(url.match(r)[0]);
+    // var productId = url.
 
-        for (const xpath of xpaths.image){
-
-            // get image
-            const [el3] = await page.$x(xpath);// //*[@id="landingImage"]
-            if (el3 !== undefined){
-                const src = await el3.getProperty('src');
-                const image = (await src.jsonValue()).trim();
-                console.log(image);
-                break ;
-            }
-            
-
-        }
-
-        for (const xpath of xpaths.description){
-            // get description
-            const [el4] = await page.$x(xpath);// //*[@id="productTitle"]
-            if(el4 !== undefined){
-                const txtDesc = await el4.getProperty('textContent');
-                const description = (await txtDesc.jsonValue()).trim();
-                console.log(description);
-                break ;
-            }
-            
-        }
-    }
     browser.close();
-    
 }
 
-scrapeAllProducts("https://www.amazon.fr/dp/B08VRVXHV7/ref=sspa_dk_detail_4?pd_rd_w=3KO44&pf_rd_p=c2093833-029c-4c81-8b25-2f17e8aa03bd&pd_rd_wg=piJuf&pf_rd_r=MPCBNWEHTWM47RH1QJWB&pd_rd_r=667c99fd-9ee7-4b9d-b3cc-1b9875dfbad0&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUEzMzAzM0VNNDFITkVIJmVuY3J5cHRlZElkPUEwOTY1NzUwMTFKRDBGWVNUQVdKSSZlbmNyeXB0ZWRBZElkPUEwNzgyNTAxMThVSjZaVTk5N1hIVCZ3aWRnZXROYW1lPXNwX2RldGFpbCZhY3Rpb249Y2xpY2tSZWRpcmVjdCZkb05vdExvZ0NsaWNrPXRydWU&th=1", "amazone")
+// superDry("https://www.superdry.be/be-fr/femme/chaussures/details/180860/bottines-style-western--noir")

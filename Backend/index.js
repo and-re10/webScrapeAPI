@@ -17,7 +17,7 @@ const fs = require('fs');
 const path = require('path');
 
 
-const XPath = [
+var XPath = [
     {
         nom: "footlocker",
         prix: [
@@ -43,16 +43,44 @@ const XPath = [
         description: [
             '//*[@id="productTitle"]'
         ],
+    },
+    {
+        nom: "superdry",
+        prix: [
+            '//*[@id="product234289"]/div[2]/div[1]/span'
+        ],
+        image: [
+            '//*[@id="slick-slide00"]/div/img'
+        ],
+        description: [
+            '//*[@id="product234289"]/div[2]/h1'
+        ]
     }
 ]
 
-function getXPaths(magasin){
-    var data = XPath.find(mgs => mgs.nom === magasin)
-    // data.xpaths.forEach(xpath => {
-    //     console.log(xpath)
-    // });
-
-    return data
+function getXPaths(magasin, url){
+    var data = XPath.find(mgs => {
+        return mgs.nom === magasin;
+    })
+    console.log(data);
+    if(data.nom === "superdry"){
+        var r = /\d+/;
+        const idProduct = url.match(r)[0];
+        console.log(idProduct);
+        for (let i = 0; i < data.prix.length; i++){      
+            const oldIdProduct = data.prix[i].match(r)[0];
+            console.log(oldIdProduct);
+            data.prix[i] = data.prix[i].replace(oldIdProduct, idProduct);
+            console.log(data.prix[i]); 
+        }
+        for (let i = 0; i < data.description.length; i++) {
+            const oldIdProduct = data.description[i].match(r)[0];
+            console.log(oldIdProduct);
+            data.description[i] = data.description[i].replace(oldIdProduct, idProduct);
+            console.log(data.description[i]);
+        }
+    }
+    return data;
 }
 
 // getXPaths("amazone");
@@ -63,7 +91,7 @@ async function scrapeAllProducts(url, magasin){
     await page.goto(url);
 
     const prodURL = url;
-    const xpaths = getXPaths(magasin);
+    const xpaths = getXPaths(magasin, prodURL);
     console.log(xpaths)
     // var el = await page.$x(xpaths[0]);
     // console.log(el)
