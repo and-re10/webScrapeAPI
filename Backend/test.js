@@ -518,12 +518,58 @@ const superDry = async (url) => {
 
     // console.log(newPage);
 
-    var r = /\d+/;
-    // var s = "you can enter maximum 500 choices";
-    console.log(url.match(r)[0]);
-    // var productId = url.
+    const zalando = {
+        nom: "superdry",
+        prix: [
+            'uqkIZw ka2E9k uMhVZi dgII7d _6yVObe _88STHx cMfkVL',
+        ],
+        image: [
+            '/html/body/div[4]/div/div[1]/div/div/div[1]/x-wrapper-re-1-3/div/div[2]/div/div[3]/ul/li[3]/div/div/div/img'
+        ],
+        description: [
+            '/html/body/div[4]/div/div[1]/div/div/div[2]/x-wrapper-re-1-4/div/h1/span'
+        ]
+    }
+
+    // page.$x('/html/body/div[4]/div/div[1]/div/div/div[2]/x-wrapper-re-1-4/div/div[2]/div/span');
+    // const [el] = await await page.$x('//html/body/div[4]/div/div[1]/div/div/div[1]/x-wrapper-re-1-3/div/div[2]/div/div[3]/ul/li[3]/div/div/div/img');
+    // console.log(el);
+
+    let texts = await page.evaluate(() => {
+        let elements = document.getElementsByClassName('uqkIZw ka2E9k uMhVZi dgII7d _6yVObe _88STHx cMfkVL');
+        var prix = elements[0].textContent
+        prix = Number(prix.replace(',', '.').replace('€', '').replace(/\s+/g, '').trim());
+        return prix;
+    });
+    console.log(texts);
+    let texts2 = await page.evaluate(() => {
+        let data = [];
+        let elements = document.getElementsByClassName('_6yVObe u-6V88 ka2E9k uMhVZi FxZV-M _2Pvyxl JT3_zV EKabf7 mo6ZnF _1RurXL mo6ZnF _7ZONEy');
+        return elements[0].src;
+
+    });
+    
+    console.log(texts2)
+
+    let texts3 = await page.evaluate(() => {
+        let data = [];
+        let elements = document.getElementsByClassName('EKabf7 R_QwOV');
+        return elements[0].textContent;
+    });
+    console.log(texts3)
+
+    // var txt = await el.getProperty('textContent');
+    // console.log(await txt.jsonValue())
+    // var prix = (await txt.jsonValue()).trim();
+    // prix = Number(prix.replace(',', '.').replace('€', '').replace(/\s+/g, '').trim());
+    // console.log(prix)
+
+    // var r = /\d+/;
+    // // var s = "you can enter maximum 500 choices";
+    // console.log(url.match(r)[0]);
+    // // var productId = url.
 
     browser.close();
 }
 
-// superDry("https://www.superdry.be/be-fr/femme/chaussures/details/180860/bottines-style-western--noir")
+superDry("https://fr.zalando.be/adidas-performance-colorblock-essentials-pantalon-de-survetement-blackwhite-ad541e1pq-q11.html")

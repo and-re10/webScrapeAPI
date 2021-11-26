@@ -55,7 +55,20 @@ var XPath = [
         description: [
             '//*[@id="product234289"]/div[2]/h1'
         ]
+    },
+    {
+        nom: "superdry",
+        prix: [
+            '/html/body/div[4]/div/div[1]/div/div/div[2]/x-wrapper-re-1-4/div/div[2]/div/span',
+        ],
+        image: [
+            '/html/body/div[4]/div/div[1]/div/div/div[1]/x-wrapper-re-1-3/div/div[2]/div/div[3]/ul/li[3]/div/div/div/img'
+        ],
+        description: [
+            '/html/body/div[4]/div/div[1]/div/div/div[2]/x-wrapper-re-1-4/div/h1/span'
+        ]
     }
+    
 ]
 
 function getXPaths(magasin, url){
@@ -91,6 +104,7 @@ async function scrapeAllProducts(url, magasin){
     await page.goto(url);
 
     const prodURL = url;
+
     const xpaths = getXPaths(magasin, prodURL);
     console.log(xpaths)
     // var el = await page.$x(xpaths[0]);
@@ -143,11 +157,16 @@ async function scrapeAllProducts(url, magasin){
 
         const prixActuel = prix;
         const allPrix = [prix];
+    } else {
+
+        if (magasin === "zalando"){
+            
+        }
     }
     browser.close();
     
     return {prodURL, prix, image, description, prixActuel, allPrix}
-}
+} 
 
 
 async function scrapeProduct(url){
