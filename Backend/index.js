@@ -72,9 +72,7 @@ var XPath = [
 ]
 
 function getXPaths(magasin, url){
-    var data = XPath.find(mgs => {
-        return mgs.nom === magasin;
-    })
+    var data = XPath.find(mgs => mgs.nom === magasin)
     console.log(data);
     if(data.nom === "superdry"){
         var r = /\d+/;
@@ -106,7 +104,10 @@ async function scrapeAllProducts(url, magasin){
     const prodURL = url;
 
     const xpaths = getXPaths(magasin, prodURL);
-    console.log(xpaths)
+
+
+    var prix, image, description, prixActuel, allPrix
+
     // var el = await page.$x(xpaths[0]);
     // console.log(el)
     if(xpaths){
@@ -119,12 +120,10 @@ async function scrapeAllProducts(url, magasin){
             if( el !== undefined) {
                 // get price
                 var txt = await el.getProperty('textContent');
-                console.log(await txt.jsonValue())
-                var prix = (await txt.jsonValue()).trim();
+                // console.log(await txt.jsonValue())
+                prix = (await txt.jsonValue()).trim();
                 prix = Number(prix.replace(',', '.').replace('€', '').replace(/\s+/g, '').trim());
-                console.log(prix)
-                // browser.close(); 
-
+                // console.log(prix)
                 break ;
             }
         }
@@ -135,8 +134,8 @@ async function scrapeAllProducts(url, magasin){
             const [el3] = await page.$x(xpath);// //*[@id="landingImage"]
             if (el3 !== undefined){
                 const src = await el3.getProperty('src');
-                const image = (await src.jsonValue()).trim();
-                console.log(image);
+                image = (await src.jsonValue()).trim();
+                // console.log(image);
                 break ;
             }
             
@@ -148,8 +147,8 @@ async function scrapeAllProducts(url, magasin){
             const [el4] = await page.$x(xpath);// //*[@id="productTitle"]
             if(el4 !== undefined){
                 const txtDesc = await el4.getProperty('textContent');
-                const description = (await txtDesc.jsonValue()).trim();
-                console.log(description);
+                description = (await txtDesc.jsonValue()).trim();
+                // console.log(description);
                 break ;
             }
             
@@ -163,10 +162,15 @@ async function scrapeAllProducts(url, magasin){
             
         }
     }
+
     browser.close();
-    
+    // return {msg: "produit non trouvé"}
+    // console.log({prodURL, prix, image, description, prixActuel, allPrix});
+
+
     return {prodURL, prix, image, description, prixActuel, allPrix}
 } 
+
 
 
 async function scrapeProduct(url){
@@ -217,9 +221,9 @@ async function scrapeProduct(url){
 
     const prixActuel = prix;
     const allPrix = [prix];
-    
 
-    
+
+
 
     browser.close();
     // console.log({url, prix, image, description});
@@ -278,7 +282,7 @@ async function scrapeFootLocker(url){
     browser.close();
     return {prodURL, prix, image, description, prixActuel, allPrix} ;
 
-    
+
 }
 const {getProductName, checkProductExists, addProduct, getAllProducts, updatePrice} = require("./controlers/productsController");
 // const getProductName = () => {
@@ -286,12 +290,12 @@ const {getProductName, checkProductExists, addProduct, getAllProducts, updatePri
 //         if (err) {
 //             throw err;
 //         }
-    
+
 //         // parse JSON object
 //         const parseJson = JSON.parse(data.toString());
-    
+
 //         console.log(parseJson.database.users.products)
-        
+
 //     });
 // }
 
@@ -300,7 +304,7 @@ const {getProductName, checkProductExists, addProduct, getAllProducts, updatePri
 //         if (err) {
 //             throw err;
 //         }
-    
+
 //         // parse JSON object
 //         const parseJson = JSON.parse(data.toString());
 //         console.log("Description: " + product.description)
@@ -321,7 +325,7 @@ const {getProductName, checkProductExists, addProduct, getAllProducts, updatePri
 //         } else {
 //             console.log("Product already exist");
 //         }
-        
+
 //     });
 // }
 
@@ -330,34 +334,37 @@ const {getProductName, checkProductExists, addProduct, getAllProducts, updatePri
 //         if (err) {
 //             throw err;
 //         }
-    
+
 //         // parse JSON object
 //         const parseJson = JSON.parse(data.toString());
-    
+
 //         // print JSON object
 //         console.log(parseJson);
-    
+
 //         parseJson.database.users.products.push({product})
-    
+
 //         console.log(parseJson);
-    
+
 //         fs.writeFileSync(path.resolve(__dirname, 'student.json'), JSON.stringify(parseJson));
-        
+
 //     });
 // }
 
 app.post('/add-product', async function(req, res){
 
     const { magasin, ProductURL } = req.body;
-    
+
     try {
         // const magasin = req.body.magasin;
         // const productURL = req.body.ProductURL
-        
+
         console.log(ProductURL);
+        console.log(magasin);
         // nouvelle fonction pour tous les magasins
-        product = await scrapeAllProducts(ProductURL);
+        var product = await scrapeAllProducts(ProductURL, magasin);
+        console.log(product)
         checkProductExists(product);
+
 
         // var product;
         // if (magasin === "amazone") {
@@ -375,16 +382,16 @@ app.post('/add-product', async function(req, res){
         // test
 
         product.magasin = magasin;
-        
+
         res.send(product);
     } catch (error) {
         // console.error(error)
     }
-}); 
+});
 
 app.get('/all-products', (req, res) => {
     try {
-        const products = getAllProducts();   
+        const products = getAllProducts();
         console.log(products);
         res.send(products)
     } catch (error) {
@@ -407,7 +414,7 @@ app.get('/test-json', (req, res) => {
     // setTimeout(() => {
         date = new Date();
     // }, 1000);
-    
+
     res.send(date);
 })
 
@@ -416,7 +423,7 @@ app.get('/test-json', (req, res) => {
 const readAllcontactsFromUserDB = () => {
     var data = fs.readFileSync(path.resolve('Backend', 'database.json'), 'utf-8');
     var contacts;
-    
+
     // parse JSON object
     data = JSON.parse(data.toString());
     data.database.users.find(user => {
@@ -428,7 +435,7 @@ const readAllcontactsFromUserDB = () => {
         return user.email === "andre@test.com"
     });
     console.log(contacts)
-        
+
     return contacts;
 }
 
@@ -437,10 +444,10 @@ const addContactToUserDB = () => {
         if (err) {
             throw err;
         }
-    
+
         // parse JSON object
         const parseJson = JSON.parse(data.toString());
-    
+
         // print JSON object
         // console.log(parseJson);
         var contact = {
@@ -457,12 +464,12 @@ const addContactToUserDB = () => {
             }
             return user.email === "andre@test.com"
         });
-        
+
 
         // console.log(parseJson);
-    
+
         fs.writeFileSync(path.resolve('Backend', 'database.json'), JSON.stringify(parseJson));
-        
+
     });
 }
 
@@ -471,10 +478,10 @@ const createUserToDB = (email, pass) => {
         if (err) {
             throw err;
         }
-    
+
         // parse JSON object
         const parseJson = JSON.parse(data.toString());
-    
+
         // print JSON object
         // console.log(parseJson);
         var user = {
@@ -494,16 +501,16 @@ const createUserToDB = (email, pass) => {
         }
 
         // console.log(parseJson);
-    
+
         fs.writeFileSync(path.resolve('Backend', 'database.json'), JSON.stringify(parseJson));
-        
+
     });
 }
 
 const login = (email, pass) => {
 
     var data = fs.readFileSync(path.resolve('Backend', 'database.json'), 'utf-8');
-    
+
     // parse JSON object
     data = JSON.parse(data.toString());
 
@@ -525,18 +532,52 @@ const login = (email, pass) => {
 
 app.get('/get-user-contacts', (req, res) => {
     try {
-       const data = readAllcontactsFromUserDB(); 
+       const data = readAllcontactsFromUserDB();
        res.send(data);
     } catch (error) {
         console.error(error);
     }
-    
-    
+
+
 })
+
+const registerUser = (req) => {
+
+    const { nom, prenom, email, password, phone } = req;
+
+    var data = fs.readFileSync(path.resolve('Backend', 'database.json'), 'utf-8');
+
+        // parse JSON object
+        const parseJson = JSON.parse(data.toString());
+
+        // print JSON object
+        // console.log(parseJson);
+        var user = {
+            nom: nom,
+            prenom: prenom,
+            email: email,
+            password: password,
+            phone: phone,
+            contacts: []
+        }
+        console.log(parseJson.database.users);
+        if(parseJson.database.users){
+            parseJson.database.users.push(user);
+        } else {
+            parseJson.database.users = [];
+            parseJson.database.users.push(user);
+        }
+
+        // console.log(parseJson);
+
+        fs.writeFileSync(path.resolve('Backend', 'database.json'), JSON.stringify(parseJson));
+        return user;
+    // return { nom, prenom, email, password, phone }
+}
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-    try {
+    try { 
         const user = login(email, password);
         const token = jwt.sign(user, ' mon_mot_de_passe')
         res.send(token);
@@ -544,8 +585,19 @@ app.post('/login', (req, res) => {
         console.error(error);
     }
 
-    
 
+
+})
+
+app.post('/register', (req, res) => {
+    const { nom, prenom, email, password, phone } = req.body;
+
+    try {
+        const response = registerUser(req.body);
+        res.send(response)
+    } catch (err) {
+        console.error(err);
+    }
 })
 
 app.get('/create-user', (req, res) => {
@@ -560,6 +612,6 @@ app.get('/add-contact', (req, res) => {
 
 // scrapeProduct('https://www.amazon.fr/echo-dot-3eme-generation-enceinte-connectee-avec-alexa-tissu-anthracite/dp/B07PHPXHQS/?_encoding=UTF8&pd_rd_w=q2xUl&pf_rd_p=672e9261-e57b-4ca7-a739-011bdc804371&pf_rd_r=QZY5M9736NQ9ETRS0HV0&pd_rd_r=847d27ef-42f5-49c6-8ced-0af6cbdb9506&pd_rd_wg=Fo5rT&ref_=pd_gw_unk')
 
-app.listen(8080, '0.0.0.0', function () {
+app.listen(8080, function () {
     console.log('Listening to port: ' + 8080)
 });
