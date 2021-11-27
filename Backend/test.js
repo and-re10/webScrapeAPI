@@ -445,7 +445,7 @@ function getXPaths(magasin, url){
 }
 
 
-getXPaths("superdry", "https://www.superdry.be/be-fr/femme/chaussures/details/180860/bottines-style-western--noir");
+// getXPaths("superdry", "https://www.superdry.be/be-fr/femme/chaussures/details/180860/bottines-style-western--noir");
 
 // getXPaths("amazone");
 
@@ -536,14 +536,29 @@ const superDry = async (url) => {
     // console.log(el);
 
     let texts = await page.evaluate(() => {
-        let elements = document.getElementsByClassName('uqkIZw ka2E9k uMhVZi dgII7d _6yVObe _88STHx cMfkVL');
-        var prix = elements[0].textContent
-        prix = Number(prix.replace(',', '.').replace('€', '').replace(/\s+/g, '').trim());
-        return prix;
+        var elements = document.getElementsByClassName('uqkIZw ka2E9k uMhVZi dgII7d _6yVObe _88STHx cMfkVL');// uqkIZw ka2E9k uMhVZi dgII7d _6yVObe _88STHx cMfkVL - uqkIZw ka2E9k uMhVZi FxZV-M _6yVObe pVrzNP
+        console.log(elements[0])
+        if(elements[0] !== undefined){
+            let prix = elements[0]
+            console.log("avec promo")
+            // let limit = prix.indexOf('€');
+            // console.log(limit);
+            // prix = prix.substring(limit)
+            // prix = Number(prix.replace(',', '.').replace('€', '').replace(/\s+/g, '').trim());
+            return {prix, msg: "avec promo", elements};
+        } else {
+            elements = document.getElementsByClassName('uqkIZw ka2E9k uMhVZi FxZV-M _6yVObe pVrzNP');
+            let prix = elements[0].textContent
+            console.log("sans promo")
+
+            return {prix, msg: "sans promo"}
+        }
+        
     });
+
     console.log(texts);
+
     let texts2 = await page.evaluate(() => {
-        let data = [];
         let elements = document.getElementsByClassName('_6yVObe u-6V88 ka2E9k uMhVZi FxZV-M _2Pvyxl JT3_zV EKabf7 mo6ZnF _1RurXL mo6ZnF _7ZONEy');
         return elements[0].src;
 
@@ -552,10 +567,10 @@ const superDry = async (url) => {
     console.log(texts2)
 
     let texts3 = await page.evaluate(() => {
-        let data = [];
-        let elements = document.getElementsByClassName('EKabf7 R_QwOV');
-        return elements[0].textContent;
+        let elements = document.getElementsByClassName('EKabf7 R_QwOV');// EKabf7 R_QwOV - EKabf7 R_QwOV
+        return elements[0].textContent
     });
+
     console.log(texts3)
 
     // var txt = await el.getProperty('textContent');
@@ -572,4 +587,6 @@ const superDry = async (url) => {
     browser.close();
 }
 
-superDry("https://fr.zalando.be/adidas-performance-colorblock-essentials-pantalon-de-survetement-blackwhite-ad541e1pq-q11.html")
+superDry("https://fr.zalando.be/levis-jean-droit-bleu-le221n0h8-k11.html") // https://fr.zalando.be/levis-jean-droit-bleu-le221n0h8-k11.html - https://fr.zalando.be/adidas-performance-sweat-a-capuche-blackwhite-ad541g0hu-q11.html
+
+// 
